@@ -16,6 +16,11 @@ module.exports = class CSS
       walk css, "rule", (rule) ->
         rule.selectors = rule.selectors.map (selector) -> "#{scope} #{selector}"
 
+  rewriteHover: (to) =>
+    @css.use (css) ->
+      walk css, "rule", (rule) ->
+        rule.selectors = rule.selectors.map (selector) -> selector.replace ":hover", to
+
   toCleanString: (comp = false) =>
     @clean.toString compress: comp
 
