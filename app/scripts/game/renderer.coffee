@@ -32,14 +32,32 @@ module.exports = class Renderer extends Backbone.View
 
     @listenTo mediator, "playermove", @move
 
+    @listenTo mediator, "beginContact:*&ENTITY_PLAYER", (collision) ->
+      body = collision.a
+      if body.def.el isnt undefined
+        body.def.el.classList.add "PLAYER_CONTACT"
+
+    @listenTo mediator, "endContact:*&ENTITY_PLAYER", (collision) ->
+      body = collision.a
+      if body.def.el isnt undefined
+        body.def.el.classList.remove "PLAYER_CONTACT"
+
   setHTMLCSS: (html, css) =>
     @currentHTML = html
     @currentCSS = css
 
     @$el.html html
 
+    (@$ "style").each (i, el) =>
+      $el = $ el
+      elCss = new CSS $el.text()
+      elCss.scope "#" + @el.id
+      elCss.rewriteHover ".PLAYER_CONTACT"
+      $el.text elCss.toString()
+
     css = new CSS css
     css.scope "#" + @el.id
+    css.rewriteHover ".PLAYER_CONTACT"
     console.log css.toString()
     @$style.text css.toString()
 
