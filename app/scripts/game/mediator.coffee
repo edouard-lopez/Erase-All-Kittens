@@ -99,6 +99,9 @@ frameDriver = =>
 
       frameDebug avg, diff, "split"
 
+  else
+    mediator.trigger "frame:paused"
+
   window.rAF frameDriver
 
 window.rAF frameDriver
