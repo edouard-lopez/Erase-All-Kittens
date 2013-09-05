@@ -4,6 +4,11 @@ describe "game/dom/mapper", ->
 
   expect = chai.expect
 
+  removeUpdates (mapper) ->
+    mapper.map = mapper.map.map (def) ->
+      delete def.onUpdate
+      def
+
   beforeEach ->
     Mapper = require 'game/dom/mapper'
 
@@ -71,6 +76,8 @@ describe "game/dom/mapper", ->
 
       mapper.build()
 
+      removeUpdates mapper
+
       expect(mapper.map).to.deep.equal [
         type: 'rect'
         x: 250
@@ -105,6 +112,8 @@ describe "game/dom/mapper", ->
       mapper = new Mapper el
 
       mapper.build()
+
+      removeUpdates mapper
 
       expect(mapper.map).to.deep.equal [
         type: 'circle'
@@ -149,6 +158,8 @@ describe "game/dom/mapper", ->
       mapper = new Mapper el
 
       mapper.build()
+
+      removeUpdates mapper
 
       (expect mapper.map).to.deep.equal [
         type: 'compound'
@@ -214,6 +225,8 @@ describe "game/dom/mapper", ->
 
       mapper.build()
 
+      removeUpdates mapper
+
       console.log mapper.map
 
       expect(mapper.map).to.deep.equal [
@@ -266,6 +279,8 @@ describe "game/dom/mapper", ->
       mapper = new Mapper el
 
       mapper.build()
+
+      removeUpdates mapper
 
       d1 = mapper.map[0].data
       d2 = mapper.map[1].data

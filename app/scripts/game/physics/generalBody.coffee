@@ -14,6 +14,7 @@ b2DebugDraw = Box2D.Dynamics.b2DebugDraw
 b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
 
 scale = World::scale
+scl = 1.2
 
 module.exports = class GeneralBody extends Backbone.Model
   constructor: (def) ->
@@ -30,6 +31,8 @@ module.exports = class GeneralBody extends Backbone.Model
     bd.position.Set s.x / scale, s.y / scale
 
     @fds = []
+
+    @setupUpdates s
 
     newFixture = =>
       fd = new b2FixtureDef()
@@ -51,9 +54,7 @@ module.exports = class GeneralBody extends Backbone.Model
         fd.shape = new b2CircleShape def.radius / scale
         def.width = def.height = def.radius
         if position
-          console.log _.clone fd.shape.m_p
           fd.shape.SetLocalPosition new Vector def.x/scale, def.y/scale
-          console.log _.clone fd.shape.m_p
       else if def.type is "rect"
         fd = newFixture()
         fd.shape = new b2PolygonShape()
@@ -87,6 +88,27 @@ module.exports = class GeneralBody extends Backbone.Model
     @body = body
     @world = world
 
+  setupUpdates: (def) =>
+    hasUpdated = false
+    lPos = undefined
+
+    def.onUpdate = (update) =>
+      unless hasUpdated
+        hasUpdated = true
+        @body.SetType b2Body.b2_kinematicBody
+
+      if update.updateType isnt undefined
+        pos =
+          x: update.x
+          y: update.y
+
+        if lPos isnt undefined
+          @linearVelocity x: pos.x - lPos.x, y: pos.y - lPos.y
+
+        @positionUncorrected pos
+
+        lPos = pos
+
   destroy: =>
     if @world isnt undefined then @world.world.DestroyBody @body
 
@@ -109,13 +131,23 @@ module.exports = class GeneralBody extends Backbone.Model
     else
       @body.SetPosition new Vector (p.x + @def.x) / scale, (p.y + @def.y) / scale
 
-  positionUncorrected: ->
-    p = @body.GetPosition()
-    x: (p.x * scale), y: (p.y * scale)
+  positionUncorrected:  (p) ->
+    if p is undefined
+      p = @body.GetPosition()
+      return x: (p.x * scale), y: (p.y * scale)
+    else
+      @body.SetPosition new Vector p.x / scale, p.y / scale
 
   absolutePosition: ->
     p = @body.GetPosition()
     x: p.x * scale, y: p.y * scale
+
+  linearVelocity: (v) ->
+    if v is undefined
+      v = @body.GetLinearVelocity()
+      return x: v.x * scale, y: v.y * scale
+    else
+      @body.SetLinearVelocity new Vector v.x * scl, v.y * scl
 
   angle: -> @body.GetAngle()
 
