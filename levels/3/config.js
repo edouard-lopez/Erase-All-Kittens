@@ -8,5 +8,5 @@
     "x": 0,
     "y": -320
   },
-  "target": "<div style='background: red; display: inline; position: absolute; top: 0; right: 0;'>Target</div>"
+  "target": "<div style='background: red; display: inline; position: absolute; top: -30px; right: 0;'>Target</div>"
 }

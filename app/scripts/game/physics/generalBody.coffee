@@ -109,6 +109,9 @@ module.exports = class GeneralBody extends Backbone.Model
 
         lPos = pos
 
+      if update.stop
+        @linearVelocity x: 0, y: 0
+
   destroy: =>
     if @world isnt undefined then @world.world.DestroyBody @body
 
