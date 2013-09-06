@@ -99,7 +99,6 @@ module.exports = class Mapper
     last = orig
 
     updater = (stop = false)=>
-      console.log "Update! " + node.innerHTML
       mod = @measureNode node
       mod.stop = stop
       elOffset = @el.getBoundingClientRect()
@@ -110,7 +109,7 @@ module.exports = class Mapper
       if (mod.type is last.type) and (mod.type in ["circle", "rect"])
         # A simple thing. Has to be either translate or scale.
         if (mod.x isnt last.x or mod.y isnt last.y) and (mod.width isnt last.width or mod.height isnt last.height)
-          mod.updateType = "transformTranslate"
+          mod.updateType = "translateTransform"
 
         else if (mod.x isnt last.x or mod.y isnt last.y)
           mod.updateType = "translate"
@@ -119,6 +118,9 @@ module.exports = class Mapper
           mod.updateType = "transform"
 
         orig.onUpdate mod
+
+      mod.updateType = "translateTransform"
+      orig.onUpdate mod
 
       last = mod
 
