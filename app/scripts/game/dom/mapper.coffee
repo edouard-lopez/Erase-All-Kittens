@@ -1,6 +1,7 @@
 mediator = require "game/mediator"
 
 animProp = Modernizr.prefixed "animation"
+transProp = Modernizr.prefixed "transition"
 
 animationEnd = {
   "WebkitAnimation": "webkitAnimationEnd"
@@ -21,14 +22,14 @@ transitionStart = {
   "MozTransition": "transitionstart"
   "OTransition": "otransitionstart"
   "msTransition": "MSTransitionStart"
-  "transition": "transitionstart"}[animProp]
+  "transition": "transitionstart"}[transProp]
 
 transitionEnd = {
   "WebkitTransition": "webkitTransitionEnd"
   "MozTransition": "transitionend"
   "OTransition": "otransitionend"
   "msTransition": "MSTransitionEnd"
-  "transition": "transitionend"}[animProp]
+  "transition": "transitionend"}[transProp]
 
 module.exports = class Mapper
   constructor: (@el) ->
@@ -97,8 +98,10 @@ module.exports = class Mapper
   setupUpdater: (node, orig) ->
     last = orig
 
-    updater = =>
+    updater = (stop = false)=>
+      console.log "Update! " + node.innerHTML
       mod = @measureNode node
+      mod.stop = stop
       elOffset = @el.getBoundingClientRect()
 
       mod.x -= elOffset.left
@@ -126,12 +129,12 @@ module.exports = class Mapper
       , false
     , false
 
-    node.addEventListener transitionStart, (e) ->
-      mediator.on "frame:render", updater
-      mediator.on transitionEnd,  (e) ->
-        mediator.off "frame:render", updater
-      , false
-    , false
+    node.triggerFakeTransitionStart = (e) ->
+      if (window.getComputedStyle node)[transProp + "Duration"] isnt "0s"
+        mediator.on "frame:render", updater
+        node.addEventListener transitionEnd,  (e) ->
+          mediator.off "frame:render", updater
+        , false
 
     # Check if the thing is currently animating:
     mediator.once "frame:paused", =>
@@ -143,14 +146,12 @@ module.exports = class Mapper
             mediator.on "frame:render", updater
             mediator.on transitionEnd,  (e) ->
               mediator.off "frame:render", updater
+              updater true
             , false
             mediator.on animationEnd,  (e) ->
               mediator.off "frame:render", updater
+              updater true
             , false
-
-    anim = node.style.animation or node.style[animProp]
-
-    console.log anim
 
   measureNode: (node) =>
     bounds = node.getBoundingClientRect()

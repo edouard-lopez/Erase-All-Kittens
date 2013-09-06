@@ -34,11 +34,13 @@ module.exports = class Renderer extends Backbone.View
       body = collision.a
       if body.def.el isnt undefined
         body.def.el.classList.add "PLAYER_CONTACT"
+        body.def.el.triggerFakeTransitionStart() if body.def.el.triggerFakeTransitionStart isnt undefined
 
     @listenTo mediator, "endContact:*&ENTITY_PLAYER", (collision) ->
       body = collision.a
       if body.def.el isnt undefined
         body.def.el.classList.remove "PLAYER_CONTACT"
+        body.def.el.triggerFakeTransitionStart() if body.def.el.triggerFakeTransitionStart isnt undefined
 
   setHTMLCSS: (html, css) =>
     @currentHTML = html
