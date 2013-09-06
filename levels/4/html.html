@@ -10,7 +10,7 @@
 <div class="shape circle" data-dynamic></div>
 
 <!-- <div class="shape moving">A Moving Platform!</div> -->
-<div class="shape lift">A Lift!</div>
+<!-- <div class="shape lift">A Lift!</div> -->
 
 <style>
   .pill {
@@ -30,14 +30,15 @@
   .circle {
     width: 100px;
     height: 100px;
-    border-radius: 100%;
+    border-radius: 0;
     background: green;
     float:right;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
   }
 
   .circle:hover {
     background: red;
+    border-radius: 100%;
   }
 
   .moving {
@@ -72,9 +73,10 @@
     right: 0;
     width: 100px;
     transition: all 3s ease;
+    height: 30px;
   }
 
   .lift:hover {
-    transform: translate(0, -300px);
+    height: 400px;
   }
 </style>

@@ -34,39 +34,7 @@ module.exports = class GeneralBody extends Backbone.Model
 
     @setupUpdates s
 
-    newFixture = =>
-      fd = new b2FixtureDef()
-      fd.density = 1
-      fd.friction = 0.7
-      fd.restitution = 0.3
-
-      if @data.sensor is true
-        fd.isSensor = true
-
-      @fds.push fd
-
-      fd
-
-    createShape = (def, position=false) ->
-      def = _.defaults def, GeneralBody::defDefaults
-      if def.type is "circle"
-        fd = newFixture()
-        fd.shape = new b2CircleShape def.radius / scale
-        def.width = def.height = def.radius
-        if position
-          fd.shape.SetLocalPosition new Vector def.x/scale, def.y/scale
-      else if def.type is "rect"
-        fd = newFixture()
-        fd.shape = new b2PolygonShape()
-        if position
-          fd.shape.SetAsOrientedBox def.width / scale / 2, def.height / scale / 2, (new Vector def.x/scale, def.y/scale), 0
-        else
-          fd.shape.SetAsBox def.width / scale / 2, def.height / scale / 2
-      else if def.type is "compound"
-        for shape in def.shapes
-          createShape shape, true
-
-    createShape s
+    @createFixes s
 
     ids = ["*"]
     if s.id isnt undefined
@@ -81,11 +49,51 @@ module.exports = class GeneralBody extends Backbone.Model
 
     @ids = ids
 
+  newFixture: =>
+    fd = new b2FixtureDef()
+    fd.density = 1
+    fd.friction = 0.7
+    fd.restitution = 0.3
+
+    if @data.sensor is true
+      fd.isSensor = true
+
+    @fds.push fd
+
+    fd
+
+  createFixes: (def, position=false) =>
+    def = _.defaults def, GeneralBody::defDefaults
+    if def.type is "circle"
+      fd = @newFixture()
+      fd.shape = new b2CircleShape def.radius / scale
+      def.width = def.height = def.radius
+      if position
+        fd.shape.SetLocalPosition new Vector def.x/scale, def.y/scale
+    else if def.type is "rect"
+      fd = @newFixture()
+      fd.shape = new b2PolygonShape()
+      if position
+        fd.shape.SetAsOrientedBox def.width / scale / 2, def.height / scale / 2, (new Vector def.x/scale, def.y/scale), 0
+      else
+        fd.shape.SetAsBox def.width / scale / 2, def.height / scale / 2
+    else if def.type is "compound"
+      for shape in def.shapes
+        @createFixes shape, true
+
+  removeFixes: =>
+    @body.DestroyFixture fd for fd in @fixes
+    @fds = []
+    @fixes = []
+
+  attachFixes: =>
+    @fixes = (@body.CreateFixture fd for fd in @fds)
+
   attachTo: (world) =>
     body = world.world.CreateBody @bd
-    body.CreateFixture fd for fd in @fds
     body.SetUserData @
     @body = body
+    @attachFixes()
     @world = world
 
   setupUpdates: (def) =>
@@ -95,9 +103,11 @@ module.exports = class GeneralBody extends Backbone.Model
     def.onUpdate = (update) =>
       unless hasUpdated
         hasUpdated = true
-        @body.SetType b2Body.b2_kinematicBody
+        @body.SetType b2Body.b2_kinematicBody if @body.GetType() is b2Body.b2_staticBody
 
-      if update.updateType isnt undefined
+      console.log _.clone @body
+
+      if update.updateType in ["translate", "translateTransform"]
         pos =
           x: update.x
           y: update.y
@@ -108,6 +118,11 @@ module.exports = class GeneralBody extends Backbone.Model
         @positionUncorrected pos
 
         lPos = pos
+
+      if update.updateType in ["transform", "translateTransform"]
+        @removeFixes()
+        @createFixes update
+        @attachFixes()
 
       if update.stop
         @linearVelocity x: 0, y: 0
