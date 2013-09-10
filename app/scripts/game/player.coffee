@@ -1,4 +1,5 @@
 DynamicBody = require "game/physics/dynamicBody"
+StaticBody = require "game/physics/staticBody"
 
 Vector = Box2D.Common.Math.b2Vec2
 b2WorldManifold = Box2D.Collision.b2WorldManifold
@@ -29,13 +30,34 @@ module.exports = class Player extends Backbone.View
       el: @el
       id: "ENTITY_PLAYER"
 
+    border =
+      type: "circle"
+      x: start.x + w/2
+      y: start.y + h/2
+      radius: 30
+      id: "ENTITY_PLAYER_BORDER"
+      data:
+        sensor: true
+
     @body = new DynamicBody shape
     @body.isPlayer = true
+
+    @border = new DynamicBody border
 
     @setupKeyboardControls()
 
     @listenTo mediator, "beginContact:ENTITY_PLAYER&ENTITY_TARGET", ->
       mediator.trigger "kittenfound"
+
+  attachTo: (world) =>
+    @body.attachTo world
+    @border.attachTo world
+
+    v0 = x: 0, y: 0
+
+    @listenTo mediator, "frame:process", =>
+      @border.position @body.position()
+      @border.linearVelocity v0
 
   setupKeyboardControls: ->
     torque = 5

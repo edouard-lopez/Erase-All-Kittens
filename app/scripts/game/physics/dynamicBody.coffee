@@ -22,7 +22,8 @@ module.exports = class DynamicBody extends GeneralBody
 
     @initialize()
 
-    @listenTo mediator, "frame:render", @render
+    if @def.el isnt undefined
+      @listenTo mediator, "frame:render", @render
 
   render: =>
     body = @body

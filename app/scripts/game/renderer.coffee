@@ -30,13 +30,13 @@ module.exports = class Renderer extends Backbone.View
 
     @listenTo mediator, "playermove", @move
 
-    @listenTo mediator, "beginContact:*&ENTITY_PLAYER", (collision) ->
+    @listenTo mediator, "beginContact:*&ENTITY_PLAYER_BORDER", (collision) ->
       body = collision.a
       if body.def.el isnt undefined
         body.def.el.classList.add "PLAYER_CONTACT"
         body.def.el.triggerFakeTransitionStart() if body.def.el.triggerFakeTransitionStart isnt undefined
 
-    @listenTo mediator, "endContact:*&ENTITY_PLAYER", (collision) ->
+    @listenTo mediator, "endContact:*&ENTITY_PLAYER_BORDER", (collision) ->
       body = collision.a
       if body.def.el isnt undefined
         body.def.el.classList.remove "PLAYER_CONTACT"
