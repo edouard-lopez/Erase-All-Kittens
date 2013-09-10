@@ -79,7 +79,7 @@ module.exports = class Level extends Backbone.Model
 
   addPlayer: (playerConf) =>
     player = new Player playerConf, @renderer.width, @renderer.height
-    player.body.attachTo @world
+    player.attachTo @world
     player.$el.appendTo @renderer.el
     player.id = "#{@renderer.el.id}-player"
     player.$el.attr "id", player.id
