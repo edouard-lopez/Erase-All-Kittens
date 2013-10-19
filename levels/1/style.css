@@ -2,7 +2,8 @@
   padding: 50px;
   background: white;
   border-top: black 1px solid;
-  height: 260px;
+  height: 200px;
+  width: 100%;
   position: absolute;
   bottom: 0;
   padding-top: 35px;
@@ -14,9 +15,13 @@
   height: 75px;
   position: absolute;
   left: 45%;
-  top: 130px;
+  top: 190px;
   background: white;
-  border: 1px solid black;
   text-align: center;
   padding-top: 10px;
+  background-image: url("content/common/grass-hangdown-top.png"), url("content/common/grass-hangdown-right.png"), url("content/common/grass-hangdown-left.png"), url("content/common/bricks.png");
+  background-position: top right, top right, top left, center;
+  background-repeat: repeat-x, no-repeat, no-repeat, repeat;
+  background-size: 62px 22px, 10px 44px, 10px 44px, 80px 80px;
+  box-shadow: 0 2px 0 2px rgba(0, 0, 0, 0.2);
 }
