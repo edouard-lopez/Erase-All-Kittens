@@ -8,3 +8,6 @@ bower_components
 public
 jstest
 *.!sync
+assets/locales/index/*
+*.ini
+*.mo
