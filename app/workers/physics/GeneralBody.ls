@@ -90,11 +90,15 @@ module.exports = class GeneralBody
 
   angle: (a) ~> if a? then @body.SetAngle a else @body.GetAngle!
 
-  angular-velocity: ~> @body.GetAngularVelocity!
+  angular-velocity: (v) ~>
+    if v? then @body.SetAngularVelocity v else @body.GetAngularVelocity!
 
-  linear-velocity: ~> @body.GetLinearVelocity!
+  linear-velocity: (v) ~>
+    if v? then @body.SetLinearVelocity v else @body.GetLinearVelocity!
 
   apply-torque: (n) ~> @body.ApplyTorque n
+
+  apply-force: (f) ~> @body.ApplyForce f, @body.GetWorldCenter!
 
   movement: ~> position: @position-uncorrected!, velocity: @linear-velocity!
 
